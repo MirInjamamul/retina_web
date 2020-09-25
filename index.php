@@ -195,6 +195,7 @@ if(isset($_POST['submit'])){
                 <li><a href="gallery.php">Gallery</a></li>
                 <li><a href="registration.php">Registration</a></li>
                 <li><a href="geniusRegistration.php">Retina Genius</a></li>
+                <li><a href="geniusEvents/login.php">Retina Events</a></li>
                 <li><a href="result.php">Result</a></li>
             </ul> <!-- End of /.nav-main -->
         </div>	<!-- /.navbar-collapse -->
