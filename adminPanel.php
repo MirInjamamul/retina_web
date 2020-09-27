@@ -195,6 +195,7 @@ if(isset($_POST['noticeFormImport'])){
                 <li><a href="resultUpload.php">Result Upload</a></li>
                 <li><a href="sollutionUpload.php">Solution Upload</a></li>
                 <li><a href="genisusRegistrationList2020.php">Retina Genius</a></li>
+                <li><a href="geniusEvents/dashboard.php">Retina Events</a></li>
                 <li><a href="logout.php">Logout</a></li>
             </ul> <!-- End of /.nav-main -->
         </div>	<!-- /.navbar-collapse -->

@@ -81,7 +81,7 @@
                         $total = $row['total'];
                         $sahi = $row['positive_number'];
                         $eid = $row['exam_id'];
-                    $q12=mysqli_query($con,"SELECT score FROM history WHERE eid='$eid' AND email='$email'" )or die('Error98');
+                    $q12=mysqli_query($con,"SELECT score FROM history WHERE exam_id='$eid' AND email='$email'" )or die('Error98');
                     $rowcount=mysqli_num_rows($q12);	
                     if($rowcount == 0){
                         echo 
@@ -95,7 +95,13 @@
                     }
                     else
                     {
-                    echo '<tr style="color:#99cc32"><td><center>'.$c++.'</center></td><td><center>'.$title.'&nbsp;<span title="This quiz is already solve by you" class="glyphicon glyphicon-ok" aria-hidden="true"></span></center></td><td><center>'.$total.'</center></td><td><center>'.$sahi*$total.'</center></td><td><center><b><a href="update.php?q=quizre&step=25&eid='.$eid.'&n=1&t='.$total.'" class="pull-right btn sub1" style="color:black;margin:0px;background:red"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Restart</b></span></a></b></center></td></tr>';
+                        echo 
+                            '<tr style="color:#99cc32">
+                                <td><center>'.$c++.'</center></td>
+                                <td><center>'.$title.'&nbsp;<span title="This quiz is already solve by you" class="glyphicon glyphicon-ok" aria-hidden="true"></span></center></td>
+                                <td><center>'.$total.'</center></td><td><center>'.$sahi*$total.'</center></td>
+                                <td><center><b><a href="update.php?q=quizre&step=25&eid='.$eid.'&n=1&t='.$total.'" class="pull-right btn sub1" style="color:black;margin:0px;background:red"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Restart</b></span></a></b></center></td>
+                            </tr>';
                     }
                     }
                     $c=0;
@@ -160,47 +166,70 @@
                 <?php
                     if(@$_GET['q']== 2) 
                     {
-                        $q=mysqli_query($con,"SELECT * FROM history WHERE email='$email' ORDER BY date DESC " )or die('Error197');
+                        $q=mysqli_query($con,"SELECT * FROM event_exam_history WHERE email='$email' ORDER BY date DESC " )or die('Error197');
                         echo  '<div class="panel title">
                         <table class="table table-striped title1" >
-                        <tr style="color:black;"><td><center><b>S.N.</b></center></td><td><center><b>Quiz</b></center></td><td><center><b>Question Solved</b></center></td><td><center><b>Right</b></center></td><td><center><b>Wrong<b></center></td><td><center><b>Score</b></center></td>';
+                            <tr style="color:black;">
+                                <td><center><b>S.N.</b></center></td>
+                                <td><center><b>Quiz</b></center></td>
+                                <td><center><b>Question Solved</b></center></td>
+                                <td><center><b>Right</b></center></td>
+                                <td><center><b>Wrong<b></center></td>
+                                <td><center><b>Score</b></center></td>';
                         $c=0;
                         while($row=mysqli_fetch_array($q) )
                         {
-                        $eid=$row['eid'];
+                        $eid=$row['exam_id'];
                         $s=$row['score'];
-                        $w=$row['wrong'];
-                        $r=$row['sahi'];
+                        $w=$row['wrong_answer'];
+                        $r=$row['right_answer'];
                         $qa=$row['level'];
-                        $q23=mysqli_query($con,"SELECT title FROM quiz WHERE  eid='$eid' " )or die('Error208');
+                        $q23=mysqli_query($con,"SELECT title FROM event_exam WHERE  exam_id='$eid' " )or die('Error208');
 
                         while($row=mysqli_fetch_array($q23) )
-                        {  $title=$row['title'];  }
-                        $c++;
-                        echo '<tr><td><center>'.$c.'</center></td><td><center>'.$title.'</center></td><td><center>'.$qa.'</center></td><td><center>'.$r.'</center></td><td><center>'.$w.'</center></td><td><center>'.$s.'</center></td></tr>';
+                        {  
+                            $title=$row['title'];  }
+                            $c++;
+                        echo '<tr>
+                                <td><center>'.$c.'</center></td>
+                                <td><center>'.$title.'</center></td>
+                                <td><center>'.$qa.'</center></td><td><center>'.$r.'</center></td><td><center>'.$w.'</center></td><td><center>'.$s.'</center></td>
+                                </tr>';
                         }
-                        echo'</table></div>';
+                        echo'</table>
+                        </div>';
                     }
 
                     if(@$_GET['q']== 3) 
                     {
-                        $q=mysqli_query($con,"SELECT * FROM rank ORDER BY score DESC " )or die('Error223');
-                        echo  '<div class="panel title"><div class="table-responsive">
-                        <table class="table table-striped title1" >
-                        <tr style="color:red"><td><center><b>Rank</b></center></td><td><center><b>Name</b></center></td><td><center><b>Email</b></center></td><td><center><b>Score</b></center></td></tr>';
+                        $q=mysqli_query($con,"SELECT * FROM event_exam_rank ORDER BY score DESC " )or die('Error223');
+                        echo  '<div class="panel title">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped title1" >
+                                            <tr style="color:red">
+                                                <td><center><b>Rank</b></center></td>
+                                                <td><center><b>Name</b></center></td>
+                                                <td><center><b>Email</b></center></td>
+                                                <td><center><b>Score</b></center></td>
+                                            </tr>';
                         $c=0;
 
                         while($row=mysqli_fetch_array($q) )
                         {
                             $e=$row['email'];
                             $s=$row['score'];
-                            $q12=mysqli_query($con,"SELECT * FROM user WHERE email='$e' " )or die('Error231');
+                            $q12=mysqli_query($con,"SELECT * FROM event_user WHERE email='$e' " )or die('Error231');
                             while($row=mysqli_fetch_array($q12) )
                             {
                                 $name=$row['name'];
                             }
                             $c++;
-                            echo '<tr><td style="color:black"><center><b>'.$c.'</b></center></td><td><center>'.$name.'</center></td><td><center>'.$e.'</center></td><td><center>'.$s.'</center></td></tr>';
+                            echo '<tr>
+                                        <td style="color:black"><center><b>'.$c.'</b></center></td>
+                                        <td><center>'.$name.'</center></td>
+                                        <td><center>'.$e.'</center></td>
+                                        <td><center>'.$s.'</center></td>
+                                  </tr>';
                         }
                         echo '</table></div></div>';
                     }
