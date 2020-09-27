@@ -15,23 +15,21 @@
     }
   }
 
-  if(isset($_SESSION['key']))
+  if(@$_GET['q']== 'rmquiz')
   {
-    if(@$_GET['q']== 'rmquiz' && $_SESSION['key']=='suryapinky') 
-    {
       $eid=@$_GET['eid'];
-      $result = mysqli_query($con,"SELECT * FROM questions WHERE eid='$eid' ") or die('Error');
+      $result = mysqli_query($con,"SELECT * FROM questions WHERE exam_id='$eid' ") or die('Error1 :');
       while($row = mysqli_fetch_array($result)) 
       {
-        $qid = $row['qid'];
-        $r1 = mysqli_query($con,"DELETE FROM options WHERE qid='$qid'") or die('Error');
-        $r2 = mysqli_query($con,"DELETE FROM answer WHERE qid='$qid' ") or die('Error');
+        $qid = $row['question_id'];
+        $r1 = mysqli_query($con,"DELETE FROM exam_options WHERE question_id='$qid'") or die('Error2');
+        $r2 = mysqli_query($con,"DELETE FROM event_exam_answers WHERE question_id='$qid' ") or die('Error3');
       }
-      $r3 = mysqli_query($con,"DELETE FROM questions WHERE eid='$eid' ") or die('Error');
-      $r4 = mysqli_query($con,"DELETE FROM quiz WHERE eid='$eid' ") or die('Error');
-      $r4 = mysqli_query($con,"DELETE FROM history WHERE eid='$eid' ") or die('Error');
+      $r3 = mysqli_query($con,"DELETE FROM questions WHERE exam_id='$eid' ") or die('Error4');
+      $r4 = mysqli_query($con,"DELETE FROM event_exam WHERE exam_id='$eid' ") or die('Error5');
+      $r4 = mysqli_query($con,"DELETE FROM history WHERE exam_id='$eid' ") or die('Error6');
       header("location:dashboard.php?q=5");
-    }
+    
   }
 
   if((@$_GET['q']== 'addquiz'))
