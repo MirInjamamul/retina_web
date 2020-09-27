@@ -142,6 +142,13 @@
                                         <input id="wrong" name="wrong" placeholder="Enter minus marks on wrong answer without sign" class="form-control input-md" min="0" type="number">
                                     </div>
                                 </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-12 control-label" for="exam_time"></label>  
+                                    <div class="col-md-12">
+                                        <input id="exam_time" name="exam_time" placeholder="Enter Time Limit In Minutes" class="form-control input-md" min="0" type="number">
+                                    </div>
+                                </div>
                                 
                                 <div class="form-group">
                                     <label class="col-md-12 control-label" for=""></label>

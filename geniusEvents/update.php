@@ -40,8 +40,9 @@
       $total = $_POST['total'];
       $positive_number = $_POST['right'];
       $wrong = $_POST['wrong'];
+      $exam_time = $_POST['exam_time'];
       $id=uniqid();
-      $q3=mysqli_query($con,"INSERT INTO event_exam VALUES  ('$id','$name' , '$positive_number' , '$wrong','$total', NOW())");
+      $q3=mysqli_query($con,"INSERT INTO event_exam VALUES  ('$id','$name' , '$positive_number' , '$wrong','$total', '$exam_time',NOW())");
       header("location:dashboard.php?q=4&step=2&eid=$id&n=$total");
     
   }
@@ -90,50 +91,50 @@
     $total=@$_GET['t'];
     $ans=$_POST['ans'];
     $qid=@$_GET['qid'];
-    $q=mysqli_query($con,"SELECT * FROM answer WHERE qid='$qid' " );
+    $q=mysqli_query($con,"SELECT * FROM event_exam_answers WHERE question_id='$qid' " );
     while($row=mysqli_fetch_array($q) )
-    {  $ansid=$row['ansid']; }
+    {  $ansid=$row['answer_id']; }
     if($ans == $ansid)
     {
-      $q=mysqli_query($con,"SELECT * FROM quiz WHERE eid='$eid' " );
+      $q=mysqli_query($con,"SELECT * FROM event_exam WHERE exam_id='$eid' " );
       while($row=mysqli_fetch_array($q) )
       {
-        $sahi=$row['sahi'];
+        $sahi=$row['positive_number'];
       }
       if($sn == 1)
       {
-        $q=mysqli_query($con,"INSERT INTO history VALUES('$email','$eid' ,'0','0','0','0',NOW())")or die('Error');
+        $q=mysqli_query($con,"INSERT INTO history VALUES('$eid','$email' ,'0','0','0','0',NOW())")or die('Error');
       }
-      $q=mysqli_query($con,"SELECT * FROM history WHERE eid='$eid' AND email='$email' ")or die('Error115');
+      $q=mysqli_query($con,"SELECT * FROM history WHERE exam_id='$eid' AND email='$email' ")or die('Error115');
       while($row=mysqli_fetch_array($q) )
       {
         $s=$row['score'];
-        $r=$row['sahi'];
+        $r=$row['right_answer'];
       }
       $r++;
       $s=$s+$sahi;
-      $q=mysqli_query($con,"UPDATE `history` SET `score`=$s,`level`=$sn,`sahi`=$r, date= NOW()  WHERE  email = '$email' AND eid = '$eid'")or die('Error124');
+      $q=mysqli_query($con,"UPDATE `history` SET `score`=$s,`level`=$sn,`right_answer`=$r, date= NOW()  WHERE  email = '$email' AND exam_id = '$eid'")or die('Error124');
     } 
     else
     {
-      $q=mysqli_query($con,"SELECT * FROM quiz WHERE eid='$eid' " )or die('Error129');
+      $q=mysqli_query($con,"SELECT * FROM event_exam WHERE exam_id='$eid' " )or die('Error129');
       while($row=mysqli_fetch_array($q) )
       {
-        $wrong=$row['wrong'];
+        $wrong=$row['wrong_answer'];
       }
       if($sn == 1)
       {
-        $q=mysqli_query($con,"INSERT INTO history VALUES('$email','$eid' ,'0','0','0','0',NOW() )")or die('Error137');
+        $q=mysqli_query($con,"INSERT INTO history VALUES('$eid','$email' ,'0','0','0','0',NOW() )")or die('Error137');
       }
-      $q=mysqli_query($con,"SELECT * FROM history WHERE eid='$eid' AND email='$email' " )or die('Error139');
+      $q=mysqli_query($con,"SELECT * FROM history WHERE exam_id='$eid' AND email='$email' " )or die('Error139');
       while($row=mysqli_fetch_array($q) )
       {
         $s=$row['score'];
-        $w=$row['wrong'];
+        $w=$row['wrong_answer'];
       }
       $w++;
       $s=$s-$wrong;
-      $q=mysqli_query($con,"UPDATE `history` SET `score`=$s,`level`=$sn,`wrong`=$w, date=NOW() WHERE  email = '$email' AND eid = '$eid'")or die('Error147');
+      $q=mysqli_query($con,"UPDATE `history` SET `score`=$s,`level`=$sn,`wrong_answer`=$w, date=NOW() WHERE  email = '$email' AND exam_id = '$eid'")or die('Error147');
     }
     if($sn != $total)
     {
@@ -142,16 +143,16 @@
     }
     else if( $_SESSION['key']!='suryapinky')
     {
-      $q=mysqli_query($con,"SELECT score FROM history WHERE eid='$eid' AND email='$email'" )or die('Error156');
+      $q=mysqli_query($con,"SELECT score FROM history WHERE exam_id='$eid' AND email='$email'" )or die('Error156');
       while($row=mysqli_fetch_array($q) )
       {
         $s=$row['score'];
       }
-      $q=mysqli_query($con,"SELECT * FROM rank WHERE email='$email'" )or die('Error161');
+      $q=mysqli_query($con,"SELECT * FROM event_exam_rank WHERE email='$email'" )or die('Error161');
       $rowcount=mysqli_num_rows($q);
       if($rowcount == 0)
       {
-        $q2=mysqli_query($con,"INSERT INTO rank VALUES('$email','$s',NOW())")or die('Error165');
+        $q2=mysqli_query($con,"INSERT INTO event_exam_rank VALUES('$email','$s',NOW())")or die('Error165');
       }
       else
       {
@@ -160,7 +161,7 @@
           $sun=$row['score'];
         }
         $sun=$s+$sun;
-        $q=mysqli_query($con,"UPDATE `rank` SET `score`=$sun ,time=NOW() WHERE email= '$email'")or die('Error174');
+        $q=mysqli_query($con,"UPDATE `event_exam_rank` SET `score`=$sun ,time=NOW() WHERE email= '$email'")or die('Error174');
       }
       header("location:welcome.php?q=result&eid=$eid");
     }

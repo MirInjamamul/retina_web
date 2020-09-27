@@ -11,6 +11,8 @@
         $email = $_SESSION['email'];
         include_once 'database.php';
     }
+
+    $exam_time = 1;
 ?>
 
 <!DOCTYPE html>
@@ -26,6 +28,51 @@
     <link  rel="stylesheet" href="css/font.css">
     <script src="js/jquery.js" type="text/javascript"></script>
     <script src="js/bootstrap.min.js"  type="text/javascript"></script>
+
+    <script type="text/javascript">
+        function jsFunction(){
+            var time ="<?php echo"$exam_time"?>";
+            console.log(time);
+
+        // Set the date we're counting down to
+        var oldDateObj = new Date().getTime();
+            var newDateObj = new Date();
+            newDateObj.setTime(oldDateObj + (time * 60 * 1000));
+
+            // Update the count down every 1 second
+            var x = setInterval(function() {
+
+            // Get today's date and time
+            var now = new Date().getTime();
+            console.log(now);
+            
+            //Extra Test
+            var oldDateObj = new Date().getTime();
+
+            // Find the distance between now and the count down date
+            //var distance = countDownDate - now;
+            var distance = newDateObj - oldDateObj;
+
+
+            // Time calculations for days, hours, minutes and seconds
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display the result in the element with id="demo"
+            document.getElementById("exam_time").innerHTML = days + "d " + hours + "h "
+            + minutes + "m " + seconds + "s ";
+
+            // If the count down is finished, write some text
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("exam_time").innerHTML = "EXPIRED";
+            }
+            }, 1000);
+    }
+</script>
+
 </head>
 <body>
     <nav class="navbar navbar-default title1">
@@ -46,6 +93,7 @@
             <li <?php if(@$_GET['q']==1) echo'class="active"'; ?> ><a href="welcome.php?q=1"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>&nbsp;Home<span class="sr-only">(current)</span></a></li>
             <li <?php if(@$_GET['q']==2) echo'class="active"'; ?>> <a href="welcome.php?q=2"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>&nbsp;History</a></li>
             <li <?php if(@$_GET['q']==3) echo'class="active"'; ?>> <a href="welcome.php?q=3"><span class="glyphicon glyphicon-stats" aria-hidden="true"></span>&nbsp;Ranking</a></li>
+            <li> <a href="#"><span id="exam_time" class="glyphicon glyphicon-time" aria-hidden="true"></span>&nbsp;Time Left : </a></li>
             
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -114,22 +162,30 @@
                         $eid=@$_GET['eid'];
                         $sn=@$_GET['n'];
                         $total=@$_GET['t'];
-                        $q=mysqli_query($con,"SELECT * FROM questions WHERE eid='$eid' AND sn='$sn' " );
+
+                        //Get Time
+                        $time = mysqli_query($con,"SELECT exam_time FROM event_exam WHERE exam_id='$eid'" );
+                        $row = mysqli_fetch_array($time);
+                        $exam_time = $row['exam_time'];
+                        
+                        echo '<script type="text/javascript">jsFunction();</script>';
+
+                        $q=mysqli_query($con,"SELECT * FROM questions WHERE exam_id='$eid' AND serial_no='$sn' " );
                         echo '<div class="panel" style="margin:5%">';
                         while($row=mysqli_fetch_array($q) )
                         {
-                            $qns=$row['qns'];
-                            $qid=$row['qid'];
+                            $qns=$row['question'];
+                            $qid=$row['question_id'];
                             echo '<b>Question &nbsp;'.$sn.'&nbsp;::<br /><br />'.$qns.'</b><br /><br />';
                         }
-                        $q=mysqli_query($con,"SELECT * FROM options WHERE qid='$qid' " );
+                        $q=mysqli_query($con,"SELECT * FROM exam_options WHERE question_id='$qid' " );
                         echo '<form action="update.php?q=quiz&step=2&eid='.$eid.'&n='.$sn.'&t='.$total.'&qid='.$qid.'" method="POST"  class="form-horizontal">
                         <br />';
 
                         while($row=mysqli_fetch_array($q) )
                         {
-                            $option=$row['option'];
-                            $optionid=$row['optionid'];
+                            $option=$row['options'];
+                            $optionid=$row['option_id'];
                             echo'<input type="radio" name="ans" value="'.$optionid.'">&nbsp;'.$option.'<br /><br />';
                         }
                         echo'<br /><button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span>&nbsp;Submit</button></form></div>';
@@ -138,26 +194,42 @@
                     if(@$_GET['q']== 'result' && @$_GET['eid']) 
                     {
                         $eid=@$_GET['eid'];
-                        $q=mysqli_query($con,"SELECT * FROM history WHERE eid='$eid' AND email='$email' " )or die('Error157');
+                        $q=mysqli_query($con,"SELECT * FROM history WHERE exam_id='$eid' AND email='$email' " )or die('Error157');
                         echo  '<div class="panel">
-                        <center><h1 class="title" style="color:#660033">Result</h1><center><br /><table class="table table-striped title1" style="font-size:20px;font-weight:1000;">';
+                        <center><h1 class="title" style="color:#660033">Result</h1><center><br />
+                        <table class="table table-striped title1" style="font-size:20px;font-weight:1000;">';
 
                         while($row=mysqli_fetch_array($q) )
                         {
                             $s=$row['score'];
-                            $w=$row['wrong'];
-                            $r=$row['sahi'];
+                            $w=$row['wrong_answer'];
+                            $r=$row['right_answer'];
                             $qa=$row['level'];
-                            echo '<tr style="color:#66CCFF"><td>Total Questions</td><td>'.$qa.'</td></tr>
-                                <tr style="color:#99cc32"><td>right Answer&nbsp;<span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span></td><td>'.$r.'</td></tr> 
-                                <tr style="color:red"><td>Wrong Answer&nbsp;<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></td><td>'.$w.'</td></tr>
-                                <tr style="color:#66CCFF"><td>Score&nbsp;<span class="glyphicon glyphicon-star" aria-hidden="true"></span></td><td>'.$s.'</td></tr>';
+                            echo '<tr style="color:#66CCFF">
+                                    <td>Total Questions</td>
+                                    <td>'.$qa.'</td>
+                                </tr>
+                                <tr style="color:#99cc32">
+                                    <td>right Answer&nbsp;<span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span></td>
+                                    <td>'.$r.'</td>
+                                </tr> 
+                                <tr style="color:red">
+                                    <td>Wrong Answer&nbsp;<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></td>
+                                    <td>'.$w.'</td>
+                                </tr>
+                                <tr style="color:#66CCFF">
+                                    <td>Score&nbsp;<span class="glyphicon glyphicon-star" aria-hidden="true"></span></td>
+                                    <td>'.$s.'</td>
+                                </tr>';
                         }
-                        $q=mysqli_query($con,"SELECT * FROM rank WHERE  email='$email' " )or die('Error157');
+                        $q=mysqli_query($con,"SELECT * FROM event_exam_rank WHERE  email='$email' " )or die('Error157');
                         while($row=mysqli_fetch_array($q) )
                         {
                             $s=$row['score'];
-                            echo '<tr style="color:#990000"><td>Overall Score&nbsp;<span class="glyphicon glyphicon-stats" aria-hidden="true"></span></td><td>'.$s.'</td></tr>';
+                            echo '<tr style="color:#990000">
+                                        <td>Overall Score&nbsp;<span class="glyphicon glyphicon-stats" aria-hidden="true"></span></td>
+                                        <td>'.$s.'</td>
+                                    </tr>';
                         }
                         echo '</table></div>';
                     }
