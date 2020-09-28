@@ -48,6 +48,7 @@
                     <li class="dropdown <?php if(@$_GET['q']==4 || @$_GET['q']==5) echo'active"'; ?>">
                     <li><a href="dashboard.php?q=4">Add Quiz</a></li>
                     <li><a href="dashboard.php?q=5">Remove Quiz</a></li>
+                    <li><a href="dashboard.php?q=6">Edit Quiz</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li <?php echo''; ?> > <a href="logout1.php?q=dashboard.php"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>&nbsp;Log out</a></li>
@@ -254,6 +255,54 @@
                                     <td><center>'.$total.'</center></td>
                                     <td><center>'.$sahi*$total.'</center></td>
                                     <td><center><b><a href="update.php?q=rmquiz&eid='.$eid.'" class="pull-right btn sub1" style="margin:0px;background:red;color:black"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Remove</b></span></a></b></center></td></tr>';
+                        }
+                        $c=0;
+                        echo '</table></div></div>';
+                    }
+                ?>
+
+                <?php 
+                    if(@$_GET['q']==6) 
+                    {
+                        $result = mysqli_query($con,"SELECT * FROM event_exam ORDER BY date DESC") or die('Error');
+                        echo  '<div class="panel">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped title1">
+                                            <tr>
+                                                <td><center><b>S.N.</b></center></td>
+                                                <td><center><b>Topic</b></center></td>
+                                                <td><center><b>Total question</b></center></td>
+                                                <td><center><b>Marks</b></center></td>
+                                                <td><center><b>Status</b></center></td>
+                                                <td><center><b>Action</b></center></td>
+                                            </tr>';
+                        $c=1;
+                        while($row = mysqli_fetch_array($result)) {
+                            $title = $row['title'];
+                            $total = $row['total'];
+                            $sahi = $row['positive_number'];
+                            $eid = $row['exam_id'];
+                            $start = $row['started'];
+
+                            if($start==0){
+                                echo '<tr>
+                                    <td><center>'.$c++.'</center></td>
+                                    <td><center>'.$title.'</center></td>
+                                    <td><center>'.$total.'</center></td>
+                                    <td><center>'.$sahi*$total.'</center></td>
+                                    <td><center>Exam is Closed</center></td>
+                                    <td><center><b><a href="update.php?q=startquiz&eid='.$eid.'" class="pull-right btn sub1" style="margin:0px;background:green;color:black"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Start</b></span></a></b></center></td></tr>';
+                        
+                            }else{
+                                echo '<tr>
+                                    <td><center>'.$c++.'</center></td>
+                                    <td><center>'.$title.'</center></td>
+                                    <td><center>'.$total.'</center></td>
+                                    <td><center>'.$sahi*$total.'</center></td>
+                                    <td><center>Exam is Running</center></td>
+                                    <td><center><b><a href="update.php?q=endquiz&eid='.$eid.'" class="pull-right btn sub1" style="margin:0px;background:red;color:black"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Close</b></span></a></b></center></td></tr>';
+                        
+                            }
                         }
                         $c=0;
                         echo '</table></div></div>';

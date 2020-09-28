@@ -31,6 +31,28 @@
       header("location:dashboard.php?q=5");
     
   }
+  
+  if(@$_GET['q']== 'startquiz')
+  {
+      $eid=@$_GET['eid'];
+      $start = 1;
+      
+      $q=mysqli_query($con,"UPDATE `event_exam` SET `started`=$start WHERE  exam_id = '$eid'")or die('Error998');
+    
+      header("location:dashboard.php?q=6");
+    
+  }
+
+  if(@$_GET['q']== 'endquiz')
+  {
+      $eid=@$_GET['eid'];
+      $start = 0;
+      
+      $q=mysqli_query($con,"UPDATE `event_exam` SET `started`=$start WHERE  exam_id = '$eid'")or die('Error998');
+    
+      header("location:dashboard.php?q=6");
+    
+  }
 
   if((@$_GET['q']== 'addquiz'))
   {
@@ -42,7 +64,7 @@
       $wrong = $_POST['wrong'];
       $exam_time = $_POST['exam_time'];
       $id=uniqid();
-      $q3=mysqli_query($con,"INSERT INTO event_exam VALUES  ('$id','$name' , '$positive_number' , '$wrong','$total', '$exam_time',NOW())");
+      $q3=mysqli_query($con,"INSERT INTO event_exam VALUES  ('$id','$name' , '$positive_number' , '$wrong','$total', '$exam_time','0',NOW())");
       header("location:dashboard.php?q=4&step=2&eid=$id&n=$total");
     
   }

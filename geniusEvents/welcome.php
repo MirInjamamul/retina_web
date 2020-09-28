@@ -12,7 +12,10 @@
         include_once 'database.php';
     }
 
-    $exam_time = 1;
+    // $time = mysqli_query($con,"SELECT exam_time FROM event_exam" );
+    // $row = mysqli_fetch_array($time);
+    // $exam_time = $row['exam_time'];
+
 ?>
 
 <!DOCTYPE html>
@@ -29,49 +32,51 @@
     <script src="js/jquery.js" type="text/javascript"></script>
     <script src="js/bootstrap.min.js"  type="text/javascript"></script>
 
-    <script type="text/javascript">
+    <!-- <script type="text/javascript">
         function jsFunction(){
-            var time ="<?php echo"$exam_time"?>";
-            console.log(time);
 
-        // Set the date we're counting down to
-        var oldDateObj = new Date().getTime();
-            var newDateObj = new Date();
-            newDateObj.setTime(oldDateObj + (time * 60 * 1000));
+                var time = "<?php echo $exam_time ?>"; 
 
-            // Update the count down every 1 second
-            var x = setInterval(function() {
+                // Set the date we're counting down to
+                var oldDateObj = new Date().getTime();
+                var newDateObj = new Date();
+                newDateObj.setTime(oldDateObj + (time * 60 * 1000));
 
-            // Get today's date and time
-            var now = new Date().getTime();
-            console.log(now);
+                // Update the count down every 1 second
+                var x = setInterval(function() {
+
+                // Get today's date and time
+                var now = new Date().getTime();
+                console.log(now);
+                
+                //Extra Test
+                var oldDateObj = new Date().getTime();
+
+                // Find the distance between now and the count down date
+                //var distance = countDownDate - now;
+                var distance = newDateObj - oldDateObj;
+
+
+                // Time calculations for days, hours, minutes and seconds
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Display the result in the element with id="demo"
+                document.getElementById("exam_time").innerHTML = days + "d " + hours + "h "
+                + minutes + "m " + seconds + "s ";
+
+                // If the count down is finished, write some text
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("exam_time").innerHTML = "EXPIRED";
+                }
+                }, 1000);
+           
             
-            //Extra Test
-            var oldDateObj = new Date().getTime();
-
-            // Find the distance between now and the count down date
-            //var distance = countDownDate - now;
-            var distance = newDateObj - oldDateObj;
-
-
-            // Time calculations for days, hours, minutes and seconds
-            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            // Display the result in the element with id="demo"
-            document.getElementById("exam_time").innerHTML = days + "d " + hours + "h "
-            + minutes + "m " + seconds + "s ";
-
-            // If the count down is finished, write some text
-            if (distance < 0) {
-                clearInterval(x);
-                document.getElementById("exam_time").innerHTML = "EXPIRED";
-            }
-            }, 1000);
     }
-</script>
+</script> -->
 
 </head>
 <body>
@@ -121,6 +126,7 @@
                                             <td><center><b>Topic</b></center></td>
                                             <td><center><b>Total question</b></center></td>
                                             <td><center><b>Marks</center></b></td>
+                                            <td><center><b>Status</center></b></td>
                                             <td><center><b>Action</b></center></td>
                                         </tr>';
                     $c=1;
@@ -129,28 +135,43 @@
                         $total = $row['total'];
                         $sahi = $row['positive_number'];
                         $eid = $row['exam_id'];
-                    $q12=mysqli_query($con,"SELECT score FROM history WHERE exam_id='$eid' AND email='$email'" )or die('Error98');
-                    $rowcount=mysqli_num_rows($q12);	
-                    if($rowcount == 0){
-                        echo 
-                            '<tr>
-                                <td><center>'.$c++.'</center></td>
-                                <td><center>'.$title.'</center></td>
-                                <td><center>'.$total.'</center></td>
-                                <td><center>'.$sahi*$total.'</center></td>
-                                <td><center><b><a href="welcome.php?q=quiz&step=2&eid='.$eid.'&n=1&t='.$total.'" class="btn sub1" style="color:black;margin:0px;background:#1de9b6"><span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Start</b></span></a></b></center></td>
-                            </tr>';
-                    }
-                    else
-                    {
-                        echo 
-                            '<tr style="color:#99cc32">
-                                <td><center>'.$c++.'</center></td>
-                                <td><center>'.$title.'&nbsp;<span title="This quiz is already solve by you" class="glyphicon glyphicon-ok" aria-hidden="true"></span></center></td>
-                                <td><center>'.$total.'</center></td><td><center>'.$sahi*$total.'</center></td>
-                                <td><center><b><a href="update.php?q=quizre&step=25&eid='.$eid.'&n=1&t='.$total.'" class="pull-right btn sub1" style="color:black;margin:0px;background:red"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Restart</b></span></a></b></center></td>
-                            </tr>';
-                    }
+                        $start = $row['started'];
+
+                        if($start == 1){
+                            $q12=mysqli_query($con,"SELECT score FROM history WHERE exam_id='$eid' AND email='$email'" )or die('Error98');
+                            $rowcount=mysqli_num_rows($q12);	
+                            if($rowcount == 0){
+                                echo 
+                                '<tr>
+                                    <td><center>'.$c++.'</center></td>
+                                    <td><center>'.$title.'</center></td>
+                                    <td><center>'.$total.'</center></td>
+                                    <td><center>'.$sahi*$total.'</center></td>
+                                    <td><center>Exam is Running</center></td>
+                                    <td><center><b><a href="welcome.php?q=quiz&step=2&eid='.$eid.'&n=1&t='.$total.'" class="btn sub1" style="color:black;margin:0px;background:#1de9b6"><span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Start</b></span></a></b></center></td>
+                                </tr>';
+                            }else
+                            {
+                                echo 
+                                    '<tr style="color:#99cc32">
+                                        <td><center>'.$c++.'</center></td>
+                                        <td><center>'.$title.'&nbsp;<span title="This quiz is already solve by you" class="glyphicon glyphicon-ok" aria-hidden="true"></span></center></td>
+                                        <td><center>'.$total.'</center></td><td><center>'.$sahi*$total.'</center></td>
+                                        <td><center>Exam is Running</center></td>
+                                        <td><center><b><a href="update.php?q=quizre&step=25&eid='.$eid.'&n=1&t='.$total.'" class="pull-right btn sub1" style="color:black;margin:0px;background:red"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Restart</b></span></a></b></center></td>
+                                    </tr>';
+                            }
+                        }else{
+                            echo 
+                                '<tr>
+                                    <td><center>'.$c++.'</center></td>
+                                    <td><center>'.$title.'</center></td>
+                                    <td><center>'.$total.'</center></td>
+                                    <td><center>'.$sahi*$total.'</center></td>
+                                    <td><center>Exam is Not Running</center></td>
+                                    <td><center><b><a href="#" class="btn sub1" style="color:black;margin:0px;background:#1de9b6"><span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Start</b></span></a></b></center></td>
+                                </tr>';
+                        }
                     }
                     $c=0;
                     echo '</table></div></div>';
@@ -162,13 +183,52 @@
                         $eid=@$_GET['eid'];
                         $sn=@$_GET['n'];
                         $total=@$_GET['t'];
-
-                        //Get Time
-                        $time = mysqli_query($con,"SELECT exam_time FROM event_exam WHERE exam_id='$eid'" );
-                        $row = mysqli_fetch_array($time);
-                        $exam_time = $row['exam_time'];
                         
-                        echo '<script type="text/javascript">jsFunction();</script>';
+                        $time = mysqli_query($con,"SELECT * FROM exam_time WHERE exam_id='$eid' AND email='$email' " );
+
+                        if(mysqli_num_rows($time)== 0){
+                            //Set the countdown to 1200 seconds.
+                            $_SESSION['countdown'] = 120;
+                            //Store the timestamp of when the countdown began.
+                            $_SESSION['time_started'] = time();
+                            $_SESSION['time_end'] = abs($_SESSION['time_started']+$_SESSION['countdown']);
+                            $now = time();
+
+                            //Calculate how many seconds have passed since
+                            //the countdown began.
+                            //$timeSince = $now - $_SESSION['time_started'];
+                            
+                            //How many seconds are remaining?
+                            $remainingSeconds = abs($_SESSION['time_end'] - $now);
+                            
+                            //Print out the countdown.
+                            echo "There are $remainingSeconds seconds remaining.";
+
+                            $q=mysqli_query($con,"INSERT exam_time VALUES('$eid','$email' ,'1')")or die('Error999');
+
+                         }
+                         else{
+                            $now = time();
+
+                            //Calculate how many seconds have passed since
+                            //the countdown began.
+                            //$timeSince = $now - $_SESSION['time_started'];
+                            
+                            //How many seconds are remaining?
+                            $remainingSeconds = abs($_SESSION['time_end'] - $now);
+                            
+                            //Print out the countdown.
+                            echo "There are $remainingSeconds seconds remaining.";
+                            
+                            //Check if the countdown has finished.
+                            if($remainingSeconds < 1){
+                            //Finished! Do something.
+                            }
+                        }     
+
+                        
+                        
+                        //echo '<script type="text/javascript">jsFunction();</script>';
 
                         $q=mysqli_query($con,"SELECT * FROM questions WHERE exam_id='$eid' AND serial_no='$sn' " );
                         echo '<div class="panel" style="margin:5%">';
